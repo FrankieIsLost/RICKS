@@ -28,6 +28,16 @@ contract StakingPool {
     /// @notice reward factor per user at time of staking    
     mapping(address => uint) public rewardFactorAtStakeTime;
 
+    /// @notice An event emitted when a user stakes their tokens
+    event Stake(address indexed staker, uint amount);
+
+    /// @notice An event emitted when a user unstakes their tokens and claims a reward
+    event Unstake(address indexed staker, uint stakedAmount, uint rewardAmount);
+
+    /// @notice An event emitted when a reward is deposited
+    event DepositReward(address indexed depositor, uint amount);
+
+
     constructor(address _stakingToken, address _rewardToken) {
         stakingToken = IERC20(_stakingToken);
         rewardToken = IERC20(_rewardToken);
@@ -40,23 +50,18 @@ contract StakingPool {
         stakedAmmounts[msg.sender] = amount;
         totalSupply += amount;
         rewardFactorAtStakeTime[msg.sender] = rewardFactor;
-
+        emit Stake(msg.sender, amount);
     } 
 
     /// @notice unstake tokens and claim rewards
     function unstakeAndClaimRewards() external {
-        unstakeAndClaimRewards(msg.sender);
-    }
-
-    /// @notice  unstake tokens and claim rewards
-    function unstakeAndClaimRewards(address to) private {
-        uint256 stakedAmount = stakedAmmounts[to];
-        uint256 rewardAmount = stakedAmount * (rewardFactor - rewardFactorAtStakeTime[to]);
-        totalSupply -= stakedAmmounts[to];
-        stakedAmmounts[to] = 0;
-        stakingToken.transfer(to, stakedAmount);
-        rewardToken.transfer(to, rewardAmount);
-
+        uint256 stakedAmount = stakedAmmounts[msg.sender];
+        uint256 rewardAmount = stakedAmount * (rewardFactor - rewardFactorAtStakeTime[msg.sender]);
+        totalSupply -= stakedAmmounts[msg.sender];
+        stakedAmmounts[msg.sender] = 0;
+        stakingToken.transfer(msg.sender, stakedAmount);
+        rewardToken.transfer(msg.sender, rewardAmount);
+        emit Unstake(msg.sender, stakedAmount, rewardAmount);
     }
 
     /// @notice deposit reward to be split by stakers 
@@ -66,6 +71,7 @@ contract StakingPool {
         if(totalSupply != 0) {
             rewardFactor += (amount/ totalSupply);
         }
+        emit DepositReward(msg.sender, amount);
     }
 
 }

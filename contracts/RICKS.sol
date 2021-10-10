@@ -246,6 +246,7 @@ contract RICKS is ERC20, ERC721Holder {
         return pricePerToken;
     }
 
+    /// @notice After buyout has been completed, remaining holders are able to redeem tokens for weth
     function redeemTokensForWeth() external {
         require(auctionState == AuctionState.finalized, "cannot redeem yet");
         uint256 balance = balanceOf(msg.sender);
@@ -256,6 +257,8 @@ contract RICKS is ERC20, ERC721Holder {
         IWETH(weth).transfer(msg.sender, paymentDue);
     }
 
+    /// @notice keep track of the most recent 5 prices per shard
+    /// @param newPrice newest price per shard
     function updateMostRecentPrices(uint256 newPrice) private {
         for(uint256 i = 1; i < mostRecentPrices.length; i++) {
             mostRecentPrices[i-1] = mostRecentPrices[i];
@@ -263,6 +266,7 @@ contract RICKS is ERC20, ERC721Holder {
         mostRecentPrices[mostRecentPrices.length-1] = newPrice;
     }
 
+    /// @notice average price per shard from 5 last auctions, used to determine implied valuation
     function getAveragePrice() public view returns (uint256) {
         uint256 price = 0;
         for(uint256 i = 0; i < mostRecentPrices.length; i++) {
@@ -276,26 +280,15 @@ contract RICKS is ERC20, ERC721Holder {
     function _sendETHOrWETH(address to, uint256 value) internal {
         // Try to transfer ETH to the given recipient.
         if (!_attemptETHTransfer(to, value)) {
-            // If the transfer fails, wrap and send as WETH, so that
-            // the auction is not impeded and the recipient still
-            // can claim ETH via the WETH contract (similar to escrow).
             IWETH(weth).deposit{value: value}();
             IWETH(weth).transfer(to, value);
-            // At this point, the recipient can unwrap WETH.
         }
     }
 
-    // Sending ETH is not guaranteed complete, and the method used here will return false if
-    // it fails. For example, a contract can block ETH transfer, or might use
-    // an excessive amount of gas, thereby griefing a new bidder.
-    // We should limit the gas used in transfers, and handle failure cases.
     function _attemptETHTransfer(address to, uint256 value)
         internal
         returns (bool)
     {
-        // Here increase the gas limit a reasonable amount above the default, and try
-        // to send ETH to the recipient.
-        // NOTE: This might allow the recipient to attempt a limited reentrancy attack.
         (bool success, ) = to.call{value: value, gas: 30000}("");
         return success;
     }
