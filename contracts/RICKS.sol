@@ -21,13 +21,13 @@ contract RICKS is ERC20, ERC721Holder {
     address public stakingPool;
 
     /// -----------------------------------
-    /// -------- TOKEN INFORMATION --------
+    /// -------- ERC721 INFORMATION --------
     /// -----------------------------------
 
-    /// @notice the ERC721 token address of the RICKS token
+    /// @notice the ERC721 token address being fractionalized
     address public token;
 
-    /// @notice the ERC721 token ID of the RICKS token
+    /// @notice the ERC721 token ID being fractionalized
     uint256 public id;
 
     /// -------------------------------------
@@ -43,7 +43,7 @@ contract RICKS is ERC20, ERC721Holder {
     /// @notice minimum % increase between bids. 3 decimals, ie. 100 = 10%
     uint256 public minBidIncrease;
 
-    /// @notice the length of auctions
+    /// @notice the minumum length of auctions
     uint256 public auctionLength;
 
     /// @notice the current price of the winning Bid during auction
@@ -52,19 +52,19 @@ contract RICKS is ERC20, ERC721Holder {
     /// @notice the current user winning the token auction
     address payable public winning;
 
-     /// @notice the amount of tokens in current auction
+     /// @notice the amount of tokens being sold in current auction
     uint256 public tokenAmountForAuction;
 
-    /// @notice possible states for RICKS 
+    /// @notice possible states for the auction
     enum AuctionState {empty, inactive, active, finalized }
 
     /// @notice auction's current state 
     AuctionState public auctionState;
 
-    /// @notice keep 5 most recent prices auctions finished at
+    /// @notice price per shard for the five most recent auctions
     uint256[5] public mostRecentPrices;
 
-    /// @notice index for most recent price 
+    /// @notice number of auctions that have taken place 
     uint256 public numberOfAuctions;
 
     /// @notice price per token when buyout is completed
@@ -77,12 +77,15 @@ contract RICKS is ERC20, ERC721Holder {
     /// @notice rate of daily RICKS issuance. 3 decimals, ie. 100 = 10%
     uint256 public dailyInflationRate;
 
-    /// @notice rate of daily RICKS issuance. 3 decimals, ie. 100 = 10%
+    /// @notice initial supply of RICKS tokens
     uint256 public initialSupply;
 
     /// ------------------------
     /// -------- EVENTS --------
     /// ------------------------
+
+    /// @notice An event emitted when an auction is activated
+    event Activate(address indexed initiatior);
 
     /// @notice An event emitted when an auction starts
     event Start(address indexed buyer, uint price);
@@ -135,6 +138,7 @@ contract RICKS is ERC20, ERC721Holder {
 
         //mint initial supply
          _mint(msg.sender, initialSupply);
+         emit Activate(msg.sender);
     }
 
     /// @notice kick off an auction. The msg.value is the bid amount

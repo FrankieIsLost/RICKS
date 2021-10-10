@@ -13,7 +13,7 @@ contract StakingPool {
     /// @notice token which is allowed to be staked 
     IERC20 public stakingToken;
 
-    /// @notice token which is allowed to be staked 
+    /// @notice token that is paid as a reward
     IERC20 public rewardToken;
 
     /// @notice total supply of staked token  
@@ -67,7 +67,8 @@ contract StakingPool {
     /// @notice deposit reward to be split by stakers 
     function depositReward(uint256 amount) external {
         rewardToken.transferFrom(msg.sender, address(this), amount);
-        // we only perform this calculation when there are stakers to claim reward
+        // we only perform this calculation when there are stakers to claim reward, else
+        // we receive payment but can't assign it to any staker.
         if(totalSupply != 0) {
             rewardFactor += (amount/ totalSupply);
         }
