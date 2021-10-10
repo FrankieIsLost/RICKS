@@ -4,7 +4,7 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 
-/// @notice A Staking Pool Implementation. Allows for a token to be staked, and for an ethereum rewards 
+/// @notice A Staking Pool Implementation. Allows for a token to be staked, and for a reward token 
 /// to be paid to the pool and distributed  proportionally to the staking weight at time of payment.
 /// Based on "Scalable Reward Distribution on the Ethereum Blockchain" 
 /// https://uploads-ssl.webflow.com/5ad71ffeb79acc67c8bcdaba/5ad8d1193a40977462982470_scalable-reward-distribution-paper.pdf
