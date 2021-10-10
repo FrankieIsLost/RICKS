@@ -23,6 +23,18 @@ This implementation uses an on-demand auction system, where anyone can trigger a
 
 The RICKS contract deploys a staking pool on creation. Proceeds of the auction are paid to the staking pool. Any owner of RICKS can stake their shards in the pool. Proceeds from the auction are paid proportionally by staking weight at time of distribution into the pool. Staking pool implementation is based on [Scalable Reward Distribution on the Ethereum Blockchain](https://uploads-ssl.webflow.com/5ad71ffeb79acc67c8bcdaba/5ad8d1193a40977462982470_scalable-reward-distribution-paper.pdf)
 
+## How to run 
+
+You'll need to add your alchemy key in `hardhat.config.js` in order to run tests against forked mainnet. After that, run: 
+
+```bash
+# Install dependencies
+npm install
+
+# test contracts with hardhat
+npx hardhat test
+```
+
 
 ```
 ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⡤⠶⢶⣶⣦⣄⡀⠀⠀
