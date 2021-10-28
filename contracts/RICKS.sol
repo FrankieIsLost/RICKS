@@ -127,11 +127,13 @@ contract RICKS is ERC20, ERC721Holder {
         stakingPool = address(new StakingPool(address(this), weth));
     }
 
-    /// @notice RICKS starts in `empty` state until the specified ERC721 has been transfered to the contract 
-    /// once this has been done, activate can be called to mint erc20s and start inflation schedule
+    /// @notice RICKS starts in `empty` state until the specified ERC721 has been transfered to the contract.
+    /// This function transfers ERC721 to contract, mints erc20s and start inflation schedule
     function activate() public {
         require(auctionState == AuctionState.empty, "already active");
-        require(ERC721(token).ownerOf(id) == address(this), "contract does not yet own specified ERC721");
+        
+        ERC721(token).transferFrom(msg.sender, address(this), id);
+        
         //begin inflation schedule from this point
         auctionEndTime = block.timestamp;
         auctionState = AuctionState.inactive;

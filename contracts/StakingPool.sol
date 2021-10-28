@@ -23,7 +23,7 @@ contract StakingPool {
     uint256 public rewardFactor;
 
     /// @notice staked ammount per user   
-    mapping(address => uint) public stakedAmmounts;
+    mapping(address => uint) public stakedAmounts;
 
     /// @notice reward factor per user at time of staking    
     mapping(address => uint) public rewardFactorAtStakeTime;
@@ -45,9 +45,9 @@ contract StakingPool {
 
     /// @notice stake tokens to claim rewards 
     function stake(uint256 amount) external {
-        require(stakedAmmounts[msg.sender] == 0, "need to claim current stake before performing additional stake");
+        require(stakedAmounts[msg.sender] == 0, "need to claim current stake before performing additional stake");
         stakingToken.transferFrom(msg.sender, address(this), amount);
-        stakedAmmounts[msg.sender] = amount;
+        stakedAmounts[msg.sender] = amount;
         totalSupply += amount;
         rewardFactorAtStakeTime[msg.sender] = rewardFactor;
         emit Stake(msg.sender, amount);
@@ -55,10 +55,10 @@ contract StakingPool {
 
     /// @notice unstake tokens and claim rewards
     function unstakeAndClaimRewards() external {
-        uint256 stakedAmount = stakedAmmounts[msg.sender];
+        uint256 stakedAmount = stakedAmounts[msg.sender];
         uint256 rewardAmount = stakedAmount * (rewardFactor - rewardFactorAtStakeTime[msg.sender]);
-        totalSupply -= stakedAmmounts[msg.sender];
-        stakedAmmounts[msg.sender] = 0;
+        totalSupply -= stakedAmounts[msg.sender];
+        stakedAmounts[msg.sender] = 0;
         stakingToken.transfer(msg.sender, stakedAmount);
         rewardToken.transfer(msg.sender, rewardAmount);
         emit Unstake(msg.sender, stakedAmount, rewardAmount);
