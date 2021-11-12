@@ -51,7 +51,6 @@ describe("RICKS", function () {
         const ricksInstance = await RICKSFactory.deploy("RICKS", "RKS", erc721.address, tokenId, initialRicksSupply, dailyInflationRate);
         await erc721.mint(tokenId);
         await erc721.approve(ricksInstance.address, tokenId);
-        await erc721.transferFrom(owner.address, ricksInstance.address, tokenId);
         await ricksInstance.activate();
         return ricksInstance
     }
